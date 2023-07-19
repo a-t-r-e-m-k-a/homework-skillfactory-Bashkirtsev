@@ -4,10 +4,6 @@ print("      Ввод: x y")
 print("  x - номер строки")
 print("  y - номер столбца")
 
-
-
-
-
 position_on_plate = [[" "] * 3 for i in range(3)]
 
 

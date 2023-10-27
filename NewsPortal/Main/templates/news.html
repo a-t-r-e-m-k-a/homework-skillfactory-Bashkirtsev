@@ -10,18 +10,23 @@ News
    <h1>Все новости</h1>
     <h3>{{ time_now|date:'M d Y' }}</h3>
     <h6>Всего новостей - {{ news|length }}</h6>
+
    <hr>
-   {% if news %}
+    {% if news %}
+
        <table>
            {% for new in news %}
            <tr>
                <td><h3>{{ new.caption|censor }}</h3></td>
            </tr>
            <tr>
+               <td><h6>Автор: {{ new.Author }}</h6></td>
+           </tr>
+           <tr>
                <td>Дата публикации: {{ new.create_date|date:'d M Y' }}</td>
            </tr>
            <tr>
-               <td><h4>{{ new.text|truncatewords:20|censor }}</h4><hr></td>
+               <td><h4>{{ new.text|truncatechars:20|censor }}</h4><hr></td>
            </tr>
 
            {% endfor %}
@@ -30,4 +35,27 @@ News
    {% else %}
        <h2>Новостей нет!</h2>
    {% endif %}
+
+{% if is_paginated %}
+
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
+
 {% endblock content %}

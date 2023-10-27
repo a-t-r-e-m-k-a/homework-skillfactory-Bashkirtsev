@@ -1,0 +1,16 @@
+{% extends 'flatpages/default.html' %}
+{% load censorfilter %}
+
+{% block content %}
+<h2>Вы действительно хотите удалить данный пост?</h2>
+<h1>Название - {{ object.caption| censor }}</h1>
+<p>Текст - {{ object.text | censor}}</p>
+<p>Автор - {{ object.Author }}</p>
+<p>Дата загрузки - {{ object.create_date|date:'d M Y' }}</p>
+<hr>
+<form action="" method="post">
+    {% csrf_token %}
+    <p>Удаляем "{{ object.caption | censor }}"?</p>
+    <input type="submit" value="Подтвердить" />
+</form>
+{% endblock content %}

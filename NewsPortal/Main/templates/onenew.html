@@ -1,0 +1,22 @@
+{% extends 'flatpages/default.html' %}
+
+{% load censorfilter %}
+
+{% block title %}
+Onenew
+{% endblock title %}
+
+{% block content %}
+<tr>
+    <td><h3>{{ onenew.caption|censor }}</h3></td>
+</tr>
+<tr>
+    <td><h6>Автор: {{ onenew.Author }}</h6></td>
+</tr>
+<tr>
+    <td>Дата публикации: {{ onenew.create_date|date:'d M Y' }}<hr></td>
+</tr>
+<tr>
+    <td><h4>{{ onenew.text|censor }}</h4></td>
+</tr>
+{% endblock content %}

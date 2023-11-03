@@ -56,14 +56,11 @@ class Post(models.Model):
     def preview(self):
         return self.text[0:123] + "..."
 
-    def __str__(self):
-        return f'{self.caption.title()}: {self.text[:20]}'
-
     def get_absolute_url(self):
         return f'/news/{self.id}'
 
     def __str__(self):
-        return f'{self.categoryType.CATEGORY_CHOICES}'
+        return f'{self.categoryType}'
 
 
 class PostCategory(models.Model):

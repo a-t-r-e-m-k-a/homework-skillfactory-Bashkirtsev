@@ -1,13 +1,15 @@
 from datetime import datetime
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
-from .models import Post
+from .models import Post, Category
 from .filters import PostFilter
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse, render, get_object_or_404
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import render_to_string
+
 
 
 class NewsList(ListView):
@@ -71,9 +73,21 @@ class PostSearch(ListView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class ProtectedView(TemplateView):
-    template_name = 'protected_page.html'
+class CategoryListView(ListView):
+    model = Post
+    template_name = 'category_list.html'
+    context_object_name = 'category_news_list'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, id=self.kwargs['pk'])
+        queryset = Post.objects.filter(category=self.category).order_by('-create_date')
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_subscriber'] = self.request.user not in self.category.subscribers.all()
+        context['category'] = self.category
+        return context
 
 
 @login_required
@@ -83,3 +97,30 @@ def upgrade_me(request):
     if not request.user.groups.filter(name='Authors').exists():
         authors_group.user_set.add(user)
     return redirect('/')
+
+
+@login_required
+def subscribe(request, pk):
+    user = request.user
+    category = Category.objects.get(id=pk)
+    category.subscribers.add(user)
+
+    html_content = render_to_string(
+        'send_email.html',
+        {
+            'category': category.name,
+        }
+    )
+
+    msg = EmailMultiAlternatives(
+        subject=f'{user} {category.name}',
+        body=category.name,
+        from_email='NewsPortal50@yandex.ru',
+        to=['artembaskircev282@gmail.com'],
+    )
+    msg.attach_alternative(html_content, "text/html")
+
+    msg.send()
+
+    message = 'Вы подписались на рассылку новостей категории'
+    return render(request, 'subscribed.html', {'category': category, 'message': message})

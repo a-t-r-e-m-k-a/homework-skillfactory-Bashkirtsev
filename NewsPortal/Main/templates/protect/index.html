@@ -1,4 +1,5 @@
 {% extends "main.html" %}
+{% load censorfilter %}
 
 {% block content %}
 <h2>Страница авторизованного пользователя {{request.user.username}}</h2>

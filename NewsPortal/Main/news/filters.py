@@ -1,5 +1,5 @@
 from django_filters import FilterSet, CharFilter, DateFilter, ModelChoiceFilter
-from .models import Post, Author
+from .models import Post, Author, Category
 from django.forms import DateInput
 
 
@@ -18,9 +18,14 @@ class PostFilter(FilterSet):
                                lookup_expr='exact',
                                queryset=Author.objects.all()
                                )
-    datetime = DateFilter(
-        field_name='create_date',
-        widget=DateInput(attrs={'type': 'date'}),
-        lookup_expr='gt',
-        label='Даты позже'
-    )
+    datetime = DateFilter(field_name='create_date',
+                          widget=DateInput(attrs={'type': 'date'}),
+                          lookup_expr='gt',
+                          label='Даты позже'
+                          )
+    category = ModelChoiceFilter(field_name='category',
+                                 label='Категория:',
+                                 lookup_expr='exact',
+                                 queryset=Category.objects.all()
+                                 )
+

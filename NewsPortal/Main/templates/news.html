@@ -1,12 +1,12 @@
 {% extends 'flatpages/default.html' %}
-
+{% load cache %}
 {% load censorfilter %}
 
 {% block title %}
 News
 {% endblock title %}
-
-{{% block content %}
+{% cache 300 news %}
+    {% block content %}
    <h1>Все новости</h1>
     <h3>{{ time_now|date:'M d Y' }}</h3>
     <h6>Всего новостей - {{ news|length }}</h6>
@@ -57,5 +57,5 @@ News
     {% endif %}
 
 {% endif %}
-
-{% endblock content %}
+    {% endblock content %}
+{% endcache %}

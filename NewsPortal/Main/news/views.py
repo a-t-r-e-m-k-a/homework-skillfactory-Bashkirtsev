@@ -1,15 +1,15 @@
 from datetime import datetime
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post, Category
 from .filters import PostFilter
 from .forms import PostForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
-from django.shortcuts import redirect, reverse, render, get_object_or_404
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.shortcuts import redirect, render, get_object_or_404
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
+from django.core.cache import cache
 
 
 class NewsList(ListView):
@@ -29,6 +29,13 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'onenew.html'
     context_object_name = 'onenew'
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'onenew-{self.kwargs["pk"]}', None)
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'onenew-{self.kwargs["pk"]}', obj)
+        return obj
 
 
 class PostCreate(PermissionRequiredMixin, CreateView):
